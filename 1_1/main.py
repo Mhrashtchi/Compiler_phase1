@@ -1,5 +1,5 @@
 import pandas as pd
-dfa_table=pd.read_csv('dfa_table.csv',index_col=0)
+dfa_table=pd.read_csv('dfa_table.csv', index_col=0)
 def Lexical_Analysis(data):
     print("input :",data)
     last_token = ''
@@ -171,7 +171,7 @@ Lexical_Analysis(data)
 
 
 print()
-data="for (i=1 i==3 i=i+1) for (j=1 j==3  j=j+1) print( i  j)"
+data="for (i=1_1 i==3 i=i+1_1) for (j=1_1 j==3  j=j+1_1) print( i  j)"
 Lexical_Analysis(data)
 
 
@@ -184,6 +184,12 @@ data="x = 5 + 3 + (10 + 4)"
 Lexical_Analysis(data)
 
 
+print()
+data="else+"
+Lexical_Analysis(data)
 
+print()
+data="9a_10"
+Lexical_Analysis(data)
 
 
