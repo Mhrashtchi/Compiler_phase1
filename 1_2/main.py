@@ -2,6 +2,7 @@ class Token:
     def __init__(self, type_, value):
         self.type = type_
         self.value = value
+
     def __repr__(self):
         return f"Token <{self.value}, {self.type}>"
 
@@ -12,7 +13,7 @@ class Lexer:
         self.pos = 0
         self.current_char = self.text[self.pos]
 
-    keywords = {'if', 'else'}
+    keywords = {'if', 'else', 'print', 'while', 'elif', 'for'}
 
     def advance(self):
         self.pos += 1
@@ -27,10 +28,19 @@ class Lexer:
 
     def collect_number(self):
         num_str = ''
+        is_negative = False
+
+        if self.current_char == '-':
+            is_negative = True
+            num_str += self.current_char
+            self.advance()
+
         while self.current_char is not None and self.current_char.isdigit():
             num_str += self.current_char
             self.advance()
-        return Token('number', int(num_str))
+
+        token_type = 'negative number' if is_negative else 'number'
+        return Token(token_type, int(num_str))
 
     def collect_identifier_or_keyword(self):
         id_str = ''
@@ -49,15 +59,37 @@ class Lexer:
                 self.skip_whitespace()
                 continue
 
+
             if self.current_char.isdigit():
+                return self.collect_number()
+
+            if self.current_char == '-' and (
+                self.pos == 0 or
+                self.text[self.pos - 1] in ' (' or
+                self.text[self.pos - 1] == '='
+            ):
+
                 return self.collect_number()
 
             if self.current_char.isalpha() or self.current_char == '_':
                 return self.collect_identifier_or_keyword()
 
+
             if self.current_char == '+':
                 self.advance()
                 return Token('sum', '+')
+
+            if self.current_char == '-':
+                self.advance()
+                return Token('subtract', '-')
+
+            if self.current_char == '*':
+                self.advance()
+                return Token('multiply', '*')
+
+            if self.current_char == '/':
+                self.advance()
+                return Token('divide', '/')
 
             if self.current_char == '=':
                 self.advance()
@@ -79,17 +111,30 @@ class Lexer:
 
 
 
-text = input("Enter your code: ")
-lexer = Lexer(text)
+sentences = [
+    "x=-5+3*(y-2)/4",
+    "if x=0 print(x)",
+    "y=10+(x/2)",
+    "while(t=-9)",
+    "if (a=8) b=r-6 else color=red"
+]
 
-tokens = []
-while True:
-    token = lexer.get_next_token()
-    tokens.append(token)
-    if token.type == 'final':
-        break
 
-print("[")
-for token in tokens:
-    print(token, ",")
-print("]")
+for text in sentences:
+    lexer = Lexer(text)
+    tokens = []
+    while True:
+        token = lexer.get_next_token()
+        tokens.append(token)
+        if token.type == 'final':
+            break
+
+
+    print("\nInput:")
+    print(text)
+
+    print("\nTokens:")
+    print("[")
+    for token in tokens[:-1]:
+        print(token, ",")
+    print(tokens[-1], "]\n*********")
